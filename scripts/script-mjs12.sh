@@ -5,7 +5,7 @@ echo "====== Scripts Start ======"
 
 # check requirement
 if [ -z "$REQUIRED_VAR" ]; then 
-	echo "Error: $var not found... exiting"
+	echo "Error: $REQUIRED_VAR not found... exiting"
 	exit 1
 else 
 	echo "variable $REQUIRED_VAR found"
