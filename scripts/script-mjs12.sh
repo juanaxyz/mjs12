@@ -4,7 +4,7 @@
 echo "====== Scripts Start ======"
 
 # check requirement
-if [-z "$var" ]; then 
+if [ -z "$var" ]; then 
 	echo "Error: $var not found... exiting"
 	exit 1
 else 
