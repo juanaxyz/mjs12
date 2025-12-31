@@ -1,0 +1,69 @@
+name: Script Workflow (Lint, Security, Test, Env)
+
+# Trigger Ketika ada push dan pull request di branch 'main'
+on:
+	push:
+		branches: [ main ]
+	pull_request:
+		branches: [ main ]
+jobs:
+	build-and-test:
+		runs-on: ubuntu-latest
+		permissions:
+			contents: read
+      security-events: write
+
+    # define env variables
+    env:
+      REQUIRED_VAR: "workflow_value"
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Ensure Script is executable
+      run: chmod +x ~/scripts/script-mjs12.sh
+
+    - name: Install Shellcheck
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+    - name: Lint Script with Shellcheck
+      run: shellcheck ~/scripts/script-mjs12.sh
+
+    # Security Stage (using Flawfinder)
+    - name: Install Flawfinder
+      run: sudo apt-get install -y flawfinder
+
+    - name: Run Flawfinder Security Scan
+      run: flawfinder ~/scripts/script-mjs12.sh
+
+      # Test Stage
+      - name: Show Test Message
+        run: echo "Running tests for the script..."
+
+      - name: Execute Script 
+        run: ~/scripts/script-mjs12.sh
+
+  package-and-deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      actions: write
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+   - name: Install Zip Utility
+      run: sudo apt-get update && sudo apt-get install -y zip
+
+    - name: Create a deployable ZIP archive
+      run: zip -r workflow_script_package.zip ~/scripts/script-mjs12.sh
+
+    - name: Upload ZIP file as a workflow artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: script-artifact
+        path: workflow_script_package.zip
